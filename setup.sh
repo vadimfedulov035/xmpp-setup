@@ -142,8 +142,11 @@ set_turn_server() {
 	done
 	# delete old settings
 	rm turn.conf
-	systemctl enable nginx
-	systemctl restart nginx
+	# set service
+	cp /root/xmpp-setup/conf/coturn.service /etc/systemd/system
+	systemctl deamon-reload
+	systemctl enable coturn nginx
+	systemctl restart coturn nginx
 }
 
 set_prosody() {
