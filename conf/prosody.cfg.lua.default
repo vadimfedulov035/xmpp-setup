@@ -1,0 +1,89 @@
+admins = { "admin@myserver.tld" }
+plugin_paths = { "/usr/local/lib/prosody/modules" }
+modules_enabled = {
+	-- Generally required
+		"roster";
+		"saslauth";
+		"tls";
+		"dialback";
+		"disco";
+	-- Not essential, but recommended
+		"carbons";
+		"pep";
+		"private";
+		"blocklist";
+		"vcard4";
+		"vcard_legacy";
+		"limits";
+	-- Nice to have
+		"version";
+		"uptime";
+		"time";
+		"ping";
+		"register";
+		"mam";
+		"csi_simple";
+		"cloud_notify";
+		"smacks";
+	-- Admin interfaces
+		"admin_adhoc";
+	-- Other specific functionality
+		"posix";
+		"turn_external";
+		"watchregistrations";
+}
+
+modules_disabled = {
+	-- "offline"; -- Store offline messages
+	-- "c2s"; -- Handle client connections
+	-- "s2s"; -- Handle server-to-server connections
+}
+
+allow_registration = true
+min_seconds_between_registrations = 21600
+
+daemonize = false;
+pidfile = "/run/prosody/prosody.pid";
+use_libevent = true
+
+authentication = "internal_hashed"
+archive_expires_after = "3d" -- (mam)
+c2s_require_encryption = true
+s2s_secure_auth = true
+
+limits = {
+	c2s = {
+		rate = "10kb/s";
+	};
+	s2sin = {
+		rate = "30kb/s";
+	};
+}
+
+storage = "sql"
+sql = {
+	driver = "PostgreSQL";
+	database = "prosody";
+	username = "prosody";
+	password = "mysecret";
+	host = "127.0.0.1";
+	port = 5432;
+}
+
+certificates = "certs"
+
+VirtualHost "myserver.tld"
+
+turn_external_host = "turn.myserver.tld"
+turn_external_secret = "mysecret"
+
+Component "conference.myserver.tld" "muc"
+	muc_tombstones = true
+	restrict_room_creation = true
+
+Component "upload.myserver.tld" "http_upload_external"
+    http_upload_external_base_url = "https://upload.myserver.tld/upload/"
+    http_upload_external_secret = "mysecret"
+    http_upload_external_file_size_limit = 100000000 -- 100 MB
+
+Include "conf.d/*.cfg.lua"
