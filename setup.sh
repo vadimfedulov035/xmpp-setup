@@ -48,7 +48,7 @@ apt update && apt upgrade -y
 apt purge lua5.1 lua5.2 -y
 apt install lua5.3 lua-event prosody prosody-modules lua-dbi-postgresql -y
 apt install nginx certbot python3-certbot-nginx -y
-apt install coturn postgresql -y
+apt install cron coturn postgresql -y
 apt autoremove -y && apt clean -y
 
 ###############################################################################
@@ -162,3 +162,26 @@ if ! su -c "psql -t -c '\du' | cut -d \| -f 1 | grep -qw $user" postgres; then
 	su -
 fi
 systemctl restart prosody postgresql nginx
+
+###############################################################################
+#            ____ ____   ___  _   _   ____  _____ _____ _   _ ____            #
+#           / ___|  _ \ / _ \| \ | | / ___|| ____|_   _| | | |  _ \           #
+#          | |   | |_) | | | |  \| | \___ \|  _|   | | | | | | |_) |          #
+#          | |___|  _ <| |_| | |\  |  ___) | |___  | | | |_| |  __/           #
+#           \____|_| \_\\___/|_| \_| |____/|_____| |_|  \___/|_|              #
+###############################################################################
+
+crontab_content=$(cat /etc/crontab)
+cronjob_base="@daily find /home/prosody-filer/upload/"
+cronjob_options="-mindepth 1 -type d -mtime +28 -print0 | xargs -0 -- rm -rf"
+cronjob_special=cronjob_base+cronjob_options
+cronjobs=(
+        "0 0 5 * * prosodyctl --root cert import /etc/letsencrypt/live/"
+        "$cronjob_special "
+)
+set -f
+for cronjob in "${cronjobs[@]}"; do
+        if ! echo "$crontab_content" | grep -q "^$cronjob"; then
+                echo $cronjob >> /etc/crontab
+        fi
+done
