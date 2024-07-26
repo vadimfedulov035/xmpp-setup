@@ -102,7 +102,7 @@ set_filer_server() {
 	# set NGINX
 	cp conf/prosody-filer.conf.default prosody-filer.conf
 	sed -i "s/myserver\.tld/$webhost/g" prosody-filer.conf
-	mv prosody-filer.conf "/etc/nginx/sites-available/$subhost"
+	mv prosody-filer.conf "/etc/nginx/sites-available/$filehost"
 	ln -s "/etc/nginx/sites-available/$filehost" /etc/nginx/sites-enabled
 	rm -f /etc/nginx/sites-enabled/default
 	# set service
