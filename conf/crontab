@@ -1,0 +1,6 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+@daily root find /home/prosody-filer/upload/ -mindepth 1 -type d -mtime +28 -print0 | xargs -0 -- rm -rf
+0 0 5 * * root prosodyctl --root cert import /etc/letsencrypt/live/
+

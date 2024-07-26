@@ -171,17 +171,5 @@ systemctl restart prosody postgresql nginx
 #           \____|_| \_\\___/|_| \_| |____/|_____| |_|  \___/|_|              #
 ###############################################################################
 
-crontab_content=$(cat /etc/crontab)
-cronjob_base="@daily find /home/prosody-filer/upload/"
-cronjob_options="-mindepth 1 -type d -mtime +28 -print0 | xargs -0 -- rm -rf"
-cronjob_special=cronjob_base+cronjob_options
-cronjobs=(
-        "0 0 5 * * prosodyctl --root cert import /etc/letsencrypt/live/"
-        "$cronjob_special "
-)
-set -f
-for cronjob in "${cronjobs[@]}"; do
-        if ! echo "$crontab_content" | grep -q "^$cronjob"; then
-                echo $cronjob >> /etc/crontab
-        fi
-done
+cp /root/kalendaro/conf/crontab /etc/cron.d/kalendaro
+systemctl restart cron
